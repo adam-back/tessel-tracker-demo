@@ -14,19 +14,24 @@ if (wifi.isEnabled()) {
 }
 
 gprs.on('ready', function() {
+	leds.green.on();
+	leds.red.off();
+	leds.blue.off();
 	var initialize = chain(commands)
 		.retry(commands.checkGprsState, 10, 2000)
 		.setBearerSetting('CONTYPE', 'GPRS')
-		.setBearerSetting('APN', 'internet')
+		.setBearerSetting('APN', env.process.APN);
 		.openBearer()
 		.initializeHttpService()
-		.setHttpParameter('URL', 'http://something.herokuapp.com/events')
+		.setHttpParameter('URL', 'https://aqueous-fortress-6655.herokuapp.com/events')
 		.setHttpParameter('CONTENT', 'application/json')
 		.setHttpParameter('TIMEOUT', '30')
 		.end(function(err) {
-			if (err) {
+			if (err && err.length > 1) {
+				console.log('error: ', error);
 				return reset();
 			}
+			console.log('about to post');
 			post();
 		});
 	var reset = function() {
@@ -38,6 +43,17 @@ gprs.on('ready', function() {
 		});
 	};
 	var post = function() {
+		console.log('coordinates: ', coords);
+		if(!coords){
+			console.log('still waiting on coordinates');
+			coords = {
+				timestamp : 4454.037,
+				 lat : 37.765246666667,
+				 lon : -122.39916833333,
+				 numSat : 0,
+				 speed : 0.88
+			}
+		}
 		if (coords) {
 			var content = coords;
 			coords = null;
@@ -45,10 +61,11 @@ gprs.on('ready', function() {
 			return commands.sendPostRequest(content, function(err) {
 				if (err) {
 					leds.red.blink(300);
-					console.log(err);
+					return console.log('Error with post: ', err);
 				}
 				leds.blue.off();
-				setTimeout(post, 500);
+				console.log('completed post request with content: ', content);
+				// setTimeout(post, 500);
 			});
 		}
 		leds.blue.blink(50, 2);
