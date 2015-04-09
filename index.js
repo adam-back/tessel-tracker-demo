@@ -23,7 +23,7 @@ gprs.on('ready', function() {
 		.setBearerSetting('APN', process.env.APN);
 		.openBearer()
 		.initializeHttpService()
-		.setHttpParameter('URL', 'https://aqueous-fortress-6655.herokuapp.com/events')
+		.setHttpParameter('URL', 'http://tesselheartbeat.azurewebsites.net/events')
 		.setHttpParameter('CONTENT', 'application/json')
 		.setHttpParameter('TIMEOUT', '30')
 		.end(function(err) {
