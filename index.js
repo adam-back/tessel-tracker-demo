@@ -20,7 +20,7 @@ gprs.on('ready', function() {
 	var initialize = chain(commands)
 		.retry(commands.checkGprsState, 10, 2000)
 		.setBearerSetting('CONTYPE', 'GPRS')
-		.setBearerSetting('APN', env.process.APN);
+		.setBearerSetting('APN', process.env.APN);
 		.openBearer()
 		.initializeHttpService()
 		.setHttpParameter('URL', 'https://aqueous-fortress-6655.herokuapp.com/events')
